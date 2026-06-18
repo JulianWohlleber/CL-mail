@@ -3,6 +3,7 @@ import type { ActionName, Keymap } from '../keymaps/keymap-types'
 import { superhumanKeymap } from '../keymaps/superhuman.keymap'
 import { mailspringKeymap } from '../keymaps/mailspring.keymap'
 import { gmailKeymap } from '../keymaps/gmail.keymap'
+import { appleMailKeymap } from '../keymaps/apple-mail.keymap'
 import { useUIStore } from '../stores/ui.store'
 import { useCommandStore } from '../stores/command.store'
 
@@ -13,7 +14,8 @@ const SEQUENCE_TIMEOUT = 500
 const KEYMAPS: Record<string, Keymap> = {
   superhuman: superhumanKeymap,
   mailspring: mailspringKeymap,
-  gmail: gmailKeymap
+  gmail: gmailKeymap,
+  'apple-mail': appleMailKeymap
 }
 
 function normalizeKey(e: KeyboardEvent): string {

@@ -1,7 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUIStore } from '../../stores/ui.store'
 import { superhumanKeymap } from '../../keymaps/superhuman.keymap'
-import type { ActionName, KeyBinding } from '../../keymaps/keymap-types'
+import { mailspringKeymap } from '../../keymaps/mailspring.keymap'
+import { gmailKeymap } from '../../keymaps/gmail.keymap'
+import { appleMailKeymap } from '../../keymaps/apple-mail.keymap'
+import type { ActionName, KeyBinding, Keymap } from '../../keymaps/keymap-types'
+
+// Same registry as useKeyboard — keep in sync (regression test #14 enforces this).
+const KEYMAPS: Record<string, Keymap> = {
+  superhuman: superhumanKeymap,
+  mailspring: mailspringKeymap,
+  gmail: gmailKeymap,
+  'apple-mail': appleMailKeymap
+}
 
 const ACTION_LABELS: Record<string, string> = {
   'navigate.down': 'Move down',
@@ -87,18 +98,22 @@ export function ShortcutsHelp() {
   const [recording, setRecording] = useState<ActionName | null>(null)
   const [recordedKeys, setRecordedKeys] = useState<string[]>([])
 
-  // Load custom bindings from settings
+  const [keymapPreset, setKeymapPreset] = useState<string>('superhuman')
+
+  // Load custom bindings + which preset the user actually picked. Sprint #3
+  // pinned this — previously we always showed superhuman, which lied to
+  // anyone on a different preset.
   useEffect(() => {
     window.api.getSettings().then((settings: any) => {
-      if (settings.customKeybindings) {
-        setCustomBindings(settings.customKeybindings)
-      }
+      if (settings.customKeybindings) setCustomBindings(settings.customKeybindings)
+      if (settings.keymapPreset) setKeymapPreset(settings.keymapPreset)
     })
   }, [])
 
-  // Build a map of action -> key from default keymap + overrides
+  // Build a map of action -> key from the active preset + overrides
+  const activeKeymap = KEYMAPS[keymapPreset] || superhumanKeymap
   const bindingMap = new Map<ActionName, string>()
-  for (const binding of superhumanKeymap) {
+  for (const binding of activeKeymap) {
     bindingMap.set(binding.action, binding.key)
   }
   for (const [action, key] of Object.entries(customBindings)) {
