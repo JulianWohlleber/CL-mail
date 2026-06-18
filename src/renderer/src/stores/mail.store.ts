@@ -25,6 +25,11 @@ interface MailState {
   // Actions
   loadFolders: (accountId?: string) => Promise<void>
   loadThreads: (folderId?: string) => Promise<void>
+  /** Append the next page of threads for the current folder. No-op if the
+   *  list has already reached the end. Sprint #4 — pages of 100. */
+  loadMoreThreads: () => Promise<void>
+  /** True once the most recent fetch returned fewer rows than the page size. */
+  endReached: boolean
   selectThread: (threadId: string | null) => Promise<void>
   navigateThread: (direction: 'up' | 'down') => void
   archive: (threadId?: string) => Promise<void>
@@ -45,6 +50,7 @@ interface MailState {
 
 export const useMailStore = create<MailState>((set, get) => ({
   threads: [],
+  endReached: false,
   selectedThreadId: null,
   selectedThread: null,
   selectedIds: [],
@@ -92,17 +98,21 @@ export const useMailStore = create<MailState>((set, get) => ({
       //   - ALL_INBOXES_ID   → cross-account inbox view
       //   - SEARCH_RESULTS_ID → FTS-filtered list (uses searchQuery from state)
       //   - anything else    → normal folder_id lookup
+      const PAGE_SIZE = 100
       let listOptions: any
       if (id === ALL_INBOXES_ID) {
-        listOptions = { allInboxes: true }
+        listOptions = { allInboxes: true, limit: PAGE_SIZE }
       } else if (id === SEARCH_RESULTS_ID) {
         const q = get().searchQuery
         if (!q) { set({ loading: false }); return }
-        listOptions = { searchText: q }
+        listOptions = { searchText: q, limit: PAGE_SIZE }
       } else {
-        listOptions = { folderId: id }
+        listOptions = { folderId: id, limit: PAGE_SIZE }
       }
       const threads = await window.api.listMail(listOptions)
+      // Sprint #4: track whether we've drained the folder so the infinite
+      // scroller in MailList knows when to stop asking for more.
+      set({ endReached: threads.length < PAGE_SIZE })
 
       // If the user switched folders while we were awaiting, drop this result.
       if ((folderId || get().currentFolderId) !== get().currentFolderId) {
@@ -126,6 +136,35 @@ export const useMailStore = create<MailState>((set, get) => ({
       }
     } catch (err) {
       set({ error: (err as Error).message, loading: false })
+    }
+  },
+
+  loadMoreThreads: async () => {
+    const { currentFolderId, threads, loading, endReached, searchQuery } = get()
+    if (!currentFolderId || loading || endReached) return
+
+    const PAGE_SIZE = 100
+    const offset = threads.length
+
+    let listOptions: any
+    if (currentFolderId === ALL_INBOXES_ID) {
+      listOptions = { allInboxes: true, limit: PAGE_SIZE, offset }
+    } else if (currentFolderId === SEARCH_RESULTS_ID) {
+      if (!searchQuery) return
+      listOptions = { searchText: searchQuery, limit: PAGE_SIZE, offset }
+    } else {
+      listOptions = { folderId: currentFolderId, limit: PAGE_SIZE, offset }
+    }
+    try {
+      const more = await window.api.listMail(listOptions)
+      // Drop the result if the user switched folders mid-fetch.
+      if (get().currentFolderId !== currentFolderId) return
+      set((s) => ({
+        threads: [...s.threads, ...more],
+        endReached: more.length < PAGE_SIZE
+      }))
+    } catch (err) {
+      console.error('[Store] loadMoreThreads failed:', err)
     }
   },
 

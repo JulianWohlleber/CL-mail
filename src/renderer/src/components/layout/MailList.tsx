@@ -19,7 +19,10 @@ export function MailList() {
   const trash = useMailStore((s) => s.trash)
   const searchQuery = useMailStore((s) => s.searchQuery)
   const exitSearch = useMailStore((s) => s.exitSearch)
+  const endReached = useMailStore((s) => s.endReached)
+  const loadMoreThreads = useMailStore((s) => s.loadMoreThreads)
   const listRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
   const [ctxMenu, setCtxMenu] = useState<{ thread: Thread; x: number; y: number } | null>(null)
   const selectedSet = new Set(selectedIds)
 
@@ -29,6 +32,21 @@ export function MailList() {
     const el = listRef.current.querySelector(`[data-thread-id="${selectedThreadId}"]`)
     el?.scrollIntoView({ block: 'nearest' })
   }, [selectedThreadId])
+
+  // Sprint #4 — infinite scroll. Observe a sentinel at the bottom; when it
+  // enters the viewport ask the store for the next page. Stop when the
+  // store has flagged endReached.
+  useEffect(() => {
+    if (!sentinelRef.current || endReached) return
+    const root = listRef.current
+    const sentinel = sentinelRef.current
+    const obs = new IntersectionObserver(
+      (entries) => { if (entries.some((e) => e.isIntersecting)) loadMoreThreads() },
+      { root, rootMargin: '300px', threshold: 0 }
+    )
+    obs.observe(sentinel)
+    return () => obs.disconnect()
+  }, [endReached, loadMoreThreads, threads.length])
 
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--paper)' }}>
@@ -150,6 +168,26 @@ export function MailList() {
               }}
             />
           ))
+        )}
+
+        {/* Infinite-scroll sentinel — sprint #4. Visible while there's more
+            to fetch; replaced by a "drained" hint at the end. */}
+        {threads.length > 0 && !endReached && (
+          <div
+            ref={sentinelRef}
+            className="py-3 text-center font-mono"
+            style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--ink-tertiary)' }}
+          >
+            Loading more…
+          </div>
+        )}
+        {threads.length > 0 && endReached && (
+          <div
+            className="py-3 text-center font-mono"
+            style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--ink-faint)' }}
+          >
+            · end ·
+          </div>
         )}
       </div>
 
