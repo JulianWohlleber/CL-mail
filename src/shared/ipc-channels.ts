@@ -39,6 +39,10 @@ export const IPC = {
   MAIL_SEND_SCHEDULED_LIST: 'mail:send-scheduled-list',
   MAIL_DRAFT_SAVE: 'mail:draft-save',
   MAIL_DRAFT_DELETE: 'mail:draft-delete',
+  // Sprint #5 — compose autosave to the local_drafts table.
+  COMPOSE_DRAFT_SAVE: 'compose:draft-save',
+  COMPOSE_DRAFT_LOAD: 'compose:draft-load',
+  COMPOSE_DRAFT_DELETE: 'compose:draft-delete',
 
   // Reminders
   REMINDER_SET: 'reminder:set',

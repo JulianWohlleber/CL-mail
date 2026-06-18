@@ -33,6 +33,11 @@ const api = {
   sendMail: (msg: any) => ipcRenderer.invoke(IPC.MAIL_SEND, msg),
   cancelSend: (id: string) => ipcRenderer.invoke(IPC.MAIL_SEND_CANCEL, id),
 
+  // Compose autosave (sprint #5)
+  saveDraft: (d: any) => ipcRenderer.invoke(IPC.COMPOSE_DRAFT_SAVE, d),
+  loadDraft: (key: any) => ipcRenderer.invoke(IPC.COMPOSE_DRAFT_LOAD, key),
+  deleteDraft: (id: string) => ipcRenderer.invoke(IPC.COMPOSE_DRAFT_DELETE, id),
+
   // Contacts
   suggestContacts: (query: string) => ipcRenderer.invoke(IPC.CONTACTS_SUGGEST, query),
 

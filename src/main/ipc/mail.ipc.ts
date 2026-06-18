@@ -388,6 +388,57 @@ export function registerMailHandlers(db: Database.Database): void {
     return { cancelled: outbox.cancel(messageId) }
   })
 
+  // ── Compose draft autosave (sprint #5) ──────────────────────────────────
+  ipcMain.handle(IPC.COMPOSE_DRAFT_SAVE, (_event, d: any) => {
+    db.prepare(`
+      INSERT INTO local_drafts (id, account_id, mode, reply_to_thread_id,
+        to_list, cc_list, bcc_list, subject, body, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch())
+      ON CONFLICT(id) DO UPDATE SET
+        account_id = excluded.account_id,
+        mode = excluded.mode,
+        reply_to_thread_id = excluded.reply_to_thread_id,
+        to_list = excluded.to_list,
+        cc_list = excluded.cc_list,
+        bcc_list = excluded.bcc_list,
+        subject = excluded.subject,
+        body = excluded.body,
+        updated_at = excluded.updated_at
+    `).run(
+      d.id, d.accountId || null, d.mode, d.replyToThreadId || null,
+      JSON.stringify(d.to || []), JSON.stringify(d.cc || []),
+      JSON.stringify(d.bcc || []), d.subject || '', d.body || ''
+    )
+    return { success: true }
+  })
+
+  ipcMain.handle(IPC.COMPOSE_DRAFT_LOAD, (_event, key: { mode: string; replyToThreadId?: string }) => {
+    // Restore by (mode, replyToThreadId). For 'new', we restore the most
+    // recent draft so the user doesn't lose their open compose on a crash.
+    const row = key.replyToThreadId
+      ? db.prepare(`SELECT * FROM local_drafts WHERE mode = ? AND reply_to_thread_id = ? ORDER BY updated_at DESC LIMIT 1`).get(key.mode, key.replyToThreadId)
+      : db.prepare(`SELECT * FROM local_drafts WHERE mode = ? AND reply_to_thread_id IS NULL ORDER BY updated_at DESC LIMIT 1`).get(key.mode)
+    if (!row) return null
+    const r: any = row
+    return {
+      id: r.id,
+      accountId: r.account_id,
+      mode: r.mode,
+      replyToThreadId: r.reply_to_thread_id,
+      to: JSON.parse(r.to_list || '[]'),
+      cc: JSON.parse(r.cc_list || '[]'),
+      bcc: JSON.parse(r.bcc_list || '[]'),
+      subject: r.subject,
+      body: r.body,
+      updatedAt: r.updated_at
+    }
+  })
+
+  ipcMain.handle(IPC.COMPOSE_DRAFT_DELETE, (_event, id: string) => {
+    db.prepare(`DELETE FROM local_drafts WHERE id = ?`).run(id)
+    return { success: true }
+  })
+
   // Open attachment with system default app
   ipcMain.handle(IPC.ATTACHMENT_OPEN, (_event, attachmentId: string) => {
     const att = db.prepare('SELECT local_path, filename FROM attachments WHERE id = ?').get(attachmentId) as any

@@ -43,6 +43,11 @@ export function ComposeWindow() {
   const [showCcBcc, setShowCcBcc] = useState(false)
   const [sending, setSending] = useState(false)
   const [closing, setClosing] = useState(false)
+  // Sprint #5 — autosave bookkeeping
+  const draftIdRef = useRef<string>('draft-' + Math.random().toString(36).slice(2, 10))
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saving, setSaving] = useState(false)
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>()
   const [showSchedule, setShowSchedule] = useState(false)
   const [originalMessage, setOriginalMessage] = useState<any>(null)
   const [aiDrafting, setAiDrafting] = useState(false)
@@ -153,6 +158,48 @@ export function ComposeWindow() {
     }
   }, [composeMode, composeReplyToId])
 
+  // Sprint #5 — restore on mount, autosave on idle typing.
+  useEffect(() => {
+    ;(window.api as any).loadDraft({
+      mode: composeMode || 'new',
+      replyToThreadId: composeReplyToId
+    }).then((d: any) => {
+      if (!d) return
+      draftIdRef.current = d.id
+      // Only restore fields the user hasn't already filled out (avoid clobbering
+      // the pre-populated reply quote that the server-built draft loaded).
+      if (!subject && d.subject) setSubject(d.subject)
+      if (!body && d.body) setBody(d.body)
+      if (to.length === 0 && d.to?.length) setTo(d.to)
+      if (cc.length === 0 && d.cc?.length) setCc(d.cc)
+      if (bcc.length === 0 && d.bcc?.length) setBcc(d.bcc)
+      setSavedAt(d.updatedAt * 1000)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    // Debounced autosave — fires 1.2 s after the user stops typing.
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    if (!fromAccount && to.length === 0 && !subject && !body) return
+    saveTimer.current = setTimeout(async () => {
+      setSaving(true)
+      try {
+        await (window.api as any).saveDraft({
+          id: draftIdRef.current,
+          accountId: fromAccount?.id,
+          mode: composeMode || 'new',
+          replyToThreadId: composeReplyToId,
+          to, cc, bcc, subject, body
+        })
+        setSavedAt(Date.now())
+      } finally {
+        setSaving(false)
+      }
+    }, 1200)
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
+  }, [to, cc, bcc, subject, body, fromAccount, composeMode, composeReplyToId])
+
   const handleSend = () => {
     if (to.length === 0 || sending || !fromAccount) return
     setSending(true)
@@ -183,6 +230,8 @@ export function ComposeWindow() {
     sendPromise
       .then((result: any) => {
         if (result?.messageId) showUndoToast('Message sent', result.messageId)
+        // Successful send → discard the autosaved draft.
+        ;(window.api as any).deleteDraft(draftIdRef.current).catch(() => {})
       })
       .catch(() => {
         showUndoToast('Failed to send message', '')
@@ -391,6 +440,8 @@ export function ComposeWindow() {
             <div className="font-mono" style={{ fontSize: '11px', color: 'var(--ink-tertiary)' }}>
               ⌘↩ to send
             </div>
+            {/* Sprint #5 — autosave status pill */}
+            <SaveStatus saving={saving} savedAt={savedAt} />
             <CloudUploadButton onLinkInserted={(line) => setBody((b) => b + (b.endsWith('\n') ? '' : '\n') + line + '\n')} />
             {Object.keys(allSignatures).length > 0 && (
               <select
@@ -584,5 +635,25 @@ function CloudUploadButton({ onLinkInserted }: { onLinkInserted: (line: string) 
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Tiny relative-time pill that shows the autosave state. Sprint #5.
+ */
+function SaveStatus({ saving, savedAt }: { saving: boolean; savedAt: number | null }) {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 10_000)
+    return () => clearInterval(t)
+  }, [])
+  if (saving) return (
+    <span className="font-mono" style={{ fontSize: 11, color: 'var(--ink-tertiary)' }}>Saving…</span>
+  )
+  if (!savedAt) return null
+  const ago = Math.round((now - savedAt) / 1000)
+  const text = ago < 5 ? 'Saved' : ago < 60 ? `Saved ${ago}s ago` : `Saved ${Math.round(ago / 60)}m ago`
+  return (
+    <span className="font-mono" style={{ fontSize: 11, color: 'var(--ink-tertiary)' }}>{text}</span>
   )
 }

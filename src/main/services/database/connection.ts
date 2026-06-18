@@ -56,7 +56,8 @@ function runMigrations(db: Database.Database): void {
     { name: '007_vault_path', sql: MIGRATION_007 },
     { name: '008_fix_thread_folders', sql: MIGRATION_008 },
     { name: '009_calendar', sql: MIGRATION_009 },
-    { name: '010_cloud_storage', sql: MIGRATION_010 }
+    { name: '010_cloud_storage', sql: MIGRATION_010 },
+    { name: '011_drafts', sql: MIGRATION_011 }
   ]
 
   for (const migration of migrations) {
@@ -393,4 +394,24 @@ const MIGRATION_010 = `
     enabled INTEGER NOT NULL DEFAULT 1,
     created_at INTEGER NOT NULL DEFAULT (unixepoch())
   );
+`
+
+const MIGRATION_011 = `
+  -- Compose-window draft autosave (sprint #5). The renderer persists
+  -- in-progress messages here every ~1.2s of idle typing so a stray Cmd+W
+  -- doesn't lose work. Deleted on successful send.
+  CREATE TABLE IF NOT EXISTS local_drafts (
+    id TEXT PRIMARY KEY,
+    account_id TEXT,
+    mode TEXT NOT NULL,                 -- 'new' | 'reply' | 'reply-all' | 'forward'
+    reply_to_thread_id TEXT,            -- the source thread, if any
+    to_list TEXT NOT NULL DEFAULT '[]', -- JSON arrays of recipient strings
+    cc_list TEXT NOT NULL DEFAULT '[]',
+    bcc_list TEXT NOT NULL DEFAULT '[]',
+    subject TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_drafts_mode_thread
+    ON local_drafts(mode, reply_to_thread_id);
 `
