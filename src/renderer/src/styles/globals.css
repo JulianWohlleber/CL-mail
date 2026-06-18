@@ -102,11 +102,32 @@
     @apply flex items-center gap-1.5 px-2 py-1 rounded-sm text-sm;
     color: var(--ink-secondary);
     cursor: default;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+
+  .sidebar-item:hover {
+    background-color: var(--paper-raised);
+    color: var(--ink);
   }
 
   .sidebar-item.active {
     color: var(--ink);
     font-weight: 600;
+  }
+
+  /* a11y: a quiet but unmistakable focus ring on every interactive element.
+     Uses outline (not box-shadow) so it doesn't shift layout. The token is
+     defined in colors-{light,dark}.css; sprint #1 pinned its presence. */
+  :focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
+  /* Remove the default 1px navy ring Electron paints around buttons. */
+  button:focus { outline: none; }
+  button:focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 1px;
   }
 
   .thread-row {

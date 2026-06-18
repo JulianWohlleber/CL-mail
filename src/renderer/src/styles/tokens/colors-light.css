@@ -19,6 +19,8 @@
   --accent: #2b3fa0;
   --accent-hover: #1f2f7a;
   --accent-subtle: rgba(43, 63, 160, 0.08);
+  /* Quiet focus ring — visible but doesn't drown out the type. */
+  --accent-ring: rgba(43, 63, 160, 0.35);
 
   --border: #e5e5e0;
   --border-strong: #d4d4ce;
