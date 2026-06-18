@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMailStore } from '../../stores/mail.store'
 import { useUIStore } from '../../stores/ui.store'
 import { CollapsibleMessage } from '../mail/CollapsibleMessage'
+import { FirstRunHint } from '../shared/FirstRunHint'
 import { SnoozeBanner } from '../snooze/SnoozeBanner'
 import { ReminderPopover } from '../mail/ReminderPopover'
 
@@ -91,6 +92,7 @@ export function ReadingPane() {
           collapse to a one-line preview the user can click to expand. */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-6 py-5 space-y-2">
+          <FirstRunHint />
           {messages.map((message, index) => {
             const isLast = index === messages.length - 1
             return (
