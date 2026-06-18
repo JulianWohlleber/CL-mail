@@ -79,6 +79,24 @@ export function SearchBar() {
         <span className="kbd text-2xs">/</span>
       </div>
 
+      {/* Operator hints — visible while the box is focused but empty (sprint #6) */}
+      {isOpen && !query && (
+        <div
+          className="absolute top-full left-0 right-0 mt-1 rounded-md shadow-elevated z-30 px-3 py-2"
+          style={{ backgroundColor: 'var(--paper-overlay)', border: '1px solid var(--border)' }}
+        >
+          <div className="text-2xs mb-1 font-mono uppercase" style={{ color: 'var(--ink-tertiary)' }}>
+            Filters
+          </div>
+          <div className="text-xs space-y-0.5" style={{ color: 'var(--ink-secondary)' }}>
+            <div><code>from:hannes</code> — restrict by sender</div>
+            <div><code>subject:invoice</code> — restrict by subject</div>
+            <div><code>has:attachment</code> · <code>has:unread</code> · <code>has:starred</code></div>
+            <div className="opacity-60 mt-1">Combine operators with free text, e.g. <code>from:hannes Q3</code>.</div>
+          </div>
+        </div>
+      )}
+
       {/* Search results dropdown */}
       {isOpen && results.length > 0 && (
         <div

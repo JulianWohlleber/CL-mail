@@ -4,6 +4,7 @@ import { IPC } from '@shared/ipc-channels'
 import { SmtpClient, Outbox, type OutgoingMessage } from '../services/send/smtp-client'
 import { VaultSync } from '../services/vault/vault-sync'
 import { services } from '../services/registry'
+import { parseSearchQuery } from '../services/search/parse-query'
 import { randomUUID } from 'crypto'
 import { copyFileSync, existsSync, writeFileSync } from 'fs'
 import { join } from 'path'
@@ -157,17 +158,23 @@ export function registerMailHandlers(db: Database.Database): void {
         WHERE f.role = 'inbox' AND a.enabled = 1
       )`
     } else if (options.searchText) {
-      // Full-text search: keep threads that have at least one message matching
-      // the FTS query. Skips trash by default — searching from trash is rarely
-      // what the user wants. We deliberately don't filter by folderId here so
-      // search is global across all accounts.
-      query += ` AND t.id IN (
-        SELECT DISTINCT m.thread_id
-        FROM messages_fts
-        JOIN messages m ON messages_fts.rowid = m.rowid
-        WHERE messages_fts MATCH ?
-      )`
-      params.push(options.searchText)
+      // Sprint #6 — parse user-friendly operators (from:, subject:, has:…)
+      // into structured filters + an FTS expression. Search is global across
+      // accounts; we deliberately don't filter by folderId.
+      const parsed = parseSearchQuery(options.searchText)
+      if (parsed.fts) {
+        query += ` AND t.id IN (
+          SELECT DISTINCT m.thread_id
+          FROM messages_fts
+          JOIN messages m ON messages_fts.rowid = m.rowid
+          WHERE messages_fts MATCH ?
+        )`
+        params.push(parsed.fts)
+      }
+      if (parsed.hasAttachment) query += ' AND t.has_attachments = 1'
+      if (parsed.unread === true) query += ' AND t.unread = 1'
+      if (parsed.unread === false) query += ' AND t.unread = 0'
+      if (parsed.starred) query += ' AND t.starred = 1'
     } else if (options.folderId) {
       query += ' AND t.folder_id = ?'
       params.push(options.folderId)
