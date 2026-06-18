@@ -1,0 +1,31 @@
+/* Light theme — warm paper tones inspired by iA Writer
+ *
+ * iA Writer uses a warm off-white background (#FAFAF8) with
+ * a soft charcoal ink (#1A1A1A). The palette avoids cold blue-grays
+ * in favor of warm neutrals that feel like quality paper.
+ */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-secondary: #4a4a48;
+  --ink-tertiary: #8a8a86;
+  --ink-faint: #c4c4be;
+
+  --paper: #fafaf8;
+  --paper-raised: #f0f0ec;
+  --paper-sunken: #eeeee9;
+  --paper-overlay: #ffffff;
+
+  --accent: #2b3fa0;
+  --accent-hover: #1f2f7a;
+  --accent-subtle: rgba(43, 63, 160, 0.08);
+
+  --border: #e5e5e0;
+  --border-strong: #d4d4ce;
+
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #ca8a04;
+
+  --shadow-color: 0 0% 50%;
+}

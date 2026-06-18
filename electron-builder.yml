@@ -1,0 +1,22 @@
+appId: com.mail.app
+productName: mail_
+directories:
+  buildResources: resources
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{tsconfig.json,tsconfig.*.json}'
+mac:
+  entitlementsInherit: resources/entitlements.mac.plist
+  extendInfo:
+    NSMicrophoneUsageDescription: Not required
+    NSCameraUsageDescription: Not required
+  notarize: false
+  target:
+    - dmg
+    - zip
+  artifactName: ${name}-${version}-${arch}.${ext}
+dmg:
+  artifactName: ${name}-${version}.${ext}

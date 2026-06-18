@@ -1,0 +1,30 @@
+/* Dark theme — deep warm tones inspired by iA Writer's dark mode
+ *
+ * Uses warm blacks and soft cream text, avoiding harsh pure-white
+ * or cold blue-black backgrounds.
+ */
+
+.dark {
+  --ink: #e8e8e4;
+  --ink-secondary: #b0b0aa;
+  --ink-tertiary: #787874;
+  --ink-faint: #484844;
+
+  --paper: #1a1a1a;
+  --paper-raised: #242422;
+  --paper-sunken: #141412;
+  --paper-overlay: #2a2a28;
+
+  --accent: #7b8fd4;
+  --accent-hover: #9babde;
+  --accent-subtle: rgba(43, 63, 160, 0.12);
+
+  --border: #333330;
+  --border-strong: #444440;
+
+  --danger: #f87171;
+  --success: #4ade80;
+  --warning: #facc15;
+
+  --shadow-color: 0 0% 5%;
+}

@@ -1,0 +1,27 @@
+/* Spacing scale — generous whitespace inspired by iA Writer's editor
+ *
+ * Uses an 8px base unit for a rhythmic, airy layout.
+ * iA Writer's defining quality is restraint — let content breathe.
+ */
+
+:root {
+  --space-0: 0;
+  --space-0-5: 4px;
+  --space-1: 8px;
+  --space-1-5: 12px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --max-reading-width: 680px;
+}

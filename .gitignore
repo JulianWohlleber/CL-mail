@@ -1,0 +1,14 @@
+node_modules/
+out/
+dist/
+build/
+.DS_Store
+*.log
+.vscode/
+.idea/
+.env
+.env.local
+*.tsbuildinfo
+.npm/
+.cache/
+APP ICON.png

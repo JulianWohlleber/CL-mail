@@ -1,0 +1,46 @@
+{
+  "name": "mail-space",
+  "version": "0.1.0",
+  "description": "A keyboard-first desktop mail client inspired by Superhuman and iA Writer",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "start": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "build:mac": "npm test && npm run build && electron-builder --mac",
+    "lint": "tsc --noEmit",
+    "test": "node tests/regressions/_runner.mjs"
+  },
+  "dependencies": {
+    "@carbon/icons-react": "^11.77.1",
+    "better-sqlite3": "^11.7.0",
+    "dompurify": "^3.2.4",
+    "electron-updater": "^6.3.9",
+    "imapflow": "^1.0.170",
+    "mailparser": "^3.7.2",
+    "nodemailer": "^6.9.16",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@electron-toolkit/preload": "^3.0.2",
+    "@electron-toolkit/utils": "^4.0.0",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/dompurify": "^3.2.0",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^4.0.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.0"
+  }
+}

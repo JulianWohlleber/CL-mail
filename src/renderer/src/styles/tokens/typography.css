@@ -1,0 +1,84 @@
+/* iA Writer Typography System
+ *
+ * Uses iA Writer Duo as the primary UI font — a duospace typeface where
+ * every character is either 1 or 2 units wide, giving the rhythm of
+ * monospace with the readability of proportional type.
+ *
+ * iA Writer Mono is used for metadata, shortcuts, and code.
+ *
+ * If iA fonts aren't installed, we fall back gracefully to system fonts.
+ */
+
+@font-face {
+  font-family: 'iA Writer Duo';
+  src: local('iA Writer Duo S'), local('iA Writer Duo'), local('iAWriterDuoS-Regular');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Duo';
+  src: local('iA Writer Duo S Bold'), local('iA Writer Duo Bold'), local('iAWriterDuoS-Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Duo';
+  src: local('iA Writer Duo S Italic'), local('iA Writer Duo Italic'), local('iAWriterDuoS-Italic');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Mono';
+  src: local('iA Writer Mono S'), local('iA Writer Mono'), local('iAWriterMonoS-Regular');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Mono';
+  src: local('iA Writer Mono S Bold'), local('iA Writer Mono Bold'), local('iAWriterMonoS-Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro';
+  src: local('iA Writer Quattro S'), local('iA Writer Quattro'), local('iAWriterQuattroS-Regular');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro';
+  src: local('iA Writer Quattro S Bold'), local('iA Writer Quattro Bold'), local('iAWriterQuattroS-Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'iA Writer Duo', 'iA Writer Quattro', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'iA Writer Mono', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-base: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --line-height-tight: 1.3;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+}
