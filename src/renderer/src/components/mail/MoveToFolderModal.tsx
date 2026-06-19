@@ -223,7 +223,7 @@ export function MoveToFolderModal() {
             className="px-4 py-2 text-xs"
             style={{
               borderTop: '1px solid var(--border)',
-              color: '#c0392b'
+              color: 'var(--danger)'
             }}
           >
             {createError}

@@ -97,7 +97,7 @@ export function ThreadItem({ thread, isSelected, isChecked, onClick, onContextMe
       {/* Indicators */}
       <div className="flex flex-col items-center gap-0.5 ml-2 flex-shrink-0">
         {!!thread.starred && (
-          <span style={{ fontSize: '14px', color: '#F1C40F' }}>★</span>
+          <span style={{ fontSize: '14px', color: 'var(--star)' }}>★</span>
         )}
         {!!thread.hasAttachments && (
           <span style={{ fontSize: '13px', color: 'var(--ink-tertiary)' }}>📎</span>

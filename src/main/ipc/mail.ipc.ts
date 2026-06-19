@@ -3,6 +3,7 @@ import Database from 'better-sqlite3'
 import { IPC } from '@shared/ipc-channels'
 import { SmtpClient, Outbox, type OutgoingMessage } from '../services/send/smtp-client'
 import { VaultSync } from '../services/vault/vault-sync'
+import { KeychainService } from '../services/credentials/keychain'
 import { services } from '../services/registry'
 import { parseSearchQuery } from '../services/search/parse-query'
 import { randomUUID } from 'crypto'
@@ -29,6 +30,7 @@ export function registerMailHandlers(db: Database.Database): void {
   const outbox = new Outbox(5)
   const smtpClients: Map<string, SmtpClient> = new Map()
   const vaultSync = new VaultSync(db)
+  const keychain = new KeychainService(db)
 
   // Re-export a single thread's markdown after a state change. Quiet-fails so
   // a vault problem can never break a mail action.
@@ -96,15 +98,17 @@ export function registerMailHandlers(db: Database.Database): void {
       const account = db.prepare('SELECT * FROM accounts WHERE id = ?').get(accountId) as any
       if (!account) throw new Error('Account not found')
 
-      const password = db
-        .prepare('SELECT value FROM settings WHERE key = ?')
-        .get(`account_password_${accountId}`) as { value: string } | undefined
+      // Route through the keychain so the password is DECRYPTED. Reading the
+      // settings row directly returns base64 ciphertext on any machine where
+      // Electron's safeStorage is available — which broke all outbound mail.
+      // (Mirrors SyncManager.getAuth, which always used the keychain.)
+      const password = keychain.retrieve(accountId)
 
       client = new SmtpClient({
         host: account.smtp_host,
         port: account.smtp_port,
         secure: account.smtp_port === 465,
-        auth: { user: account.email, pass: password?.value || '' }
+        auth: { user: account.email, pass: password || '' }
       })
       smtpClients.set(accountId, client)
     }

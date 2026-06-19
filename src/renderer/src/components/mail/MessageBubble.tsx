@@ -35,7 +35,7 @@ export function MessageBubble({ message }: Props) {
       <div
         className="email-body-card"
         style={{
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--email-canvas)',
           borderRadius: '8px',
           padding: '20px 24px',
           border: '1px solid var(--border)'

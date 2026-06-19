@@ -8,7 +8,6 @@ import { ShortcutsHelp } from './components/shared/ShortcutsHelp'
 import { MoveToFolderModal } from './components/mail/MoveToFolderModal'
 import { UndoToast } from './components/shared/UndoToast'
 import { WelcomeScreen } from './components/shared/WelcomeScreen'
-import { Tutorial } from './components/shared/Tutorial'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useTheme } from './hooks/useTheme'
 import { useMailStore } from './stores/mail.store'
@@ -66,7 +65,6 @@ export default function App() {
   const closeCommandPalette = useCommandStore((s) => s.close)
 
   const openSearch = useSearchStore((s) => s.open)
-  const [showTutorial, setShowTutorial] = useState(false)
   // Don't show the welcome screen until we've confirmed there are no accounts.
   // Otherwise it briefly flashes on every cold start before loadAccounts resolves.
   const [initialized, setInitialized] = useState(false)
@@ -77,12 +75,9 @@ export default function App() {
       .then(() => loadFolders())
       .finally(() => setInitialized(true))
 
-    // Show tutorial on first run
-    window.api.getSettings().then((settings: any) => {
-      if (!settings.tutorialComplete) {
-        setShowTutorial(true)
-      }
-    })
+    // First-run onboarding is handled by the inline FirstRunHint in the
+    // reading pane (sprint #2). The old multi-step Tutorial modal was removed
+    // in sprint #7 — it duplicated the hint and bypassed the theme tokens.
 
     // Re-load folders after sync completes (sync runs async on startup).
     // Debounce so a burst of sync events from multiple accounts doesn't cause
@@ -258,7 +253,6 @@ export default function App() {
       {settingsOpen && <SettingsPanel />}
       {shortcutsHelpOpen && <ShortcutsHelp />}
       {moveToFolderOpen && <MoveToFolderModal />}
-      {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
       <UndoToast />
     </div>
   )

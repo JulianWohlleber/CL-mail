@@ -182,7 +182,7 @@ export function AppleMailImportModal({ onClose, onImported }: Props) {
           {error && errorCode !== 'needs-full-disk-access' && (
             <div
               className="px-3 py-2 text-sm rounded"
-              style={{ color: '#c0392b', backgroundColor: 'var(--paper-raised)', border: '1px solid var(--border)' }}
+              style={{ color: 'var(--danger)', backgroundColor: 'var(--paper-raised)', border: '1px solid var(--border)' }}
             >
               {error}
             </div>
@@ -319,7 +319,7 @@ function AccountRow({
             style={{ border: '1px solid var(--border)', color: 'var(--ink)' }}
           />
           {error && (
-            <div className="text-2xs" style={{ color: '#c0392b' }}>{error}</div>
+            <div className="text-2xs" style={{ color: 'var(--danger)' }}>{error}</div>
           )}
         </div>
       )}
@@ -332,7 +332,7 @@ function StateChip({ state }: { state: RowState }) {
   const colors = {
     testing: { bg: 'var(--paper-overlay)', text: 'var(--ink-tertiary)', label: 'Testing…' },
     success: { bg: 'var(--accent-subtle)', text: 'var(--accent)', label: 'Added' },
-    error:   { bg: '#fdecea', text: '#c0392b', label: 'Failed' }
+    error:   { bg: '#fdecea', text: 'var(--danger)', label: 'Failed' }
   }[state]
   return (
     <span

@@ -133,7 +133,7 @@ export function CalendarInviteChip({ attachment, event }: Props) {
         <div className="text-2xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
           Tip: connect a CalDAV calendar in Settings → Calendar to add invites directly.
         </div>
-        {error && <div className="text-2xs mt-0.5" style={{ color: '#c0392b' }}>{error}</div>}
+        {error && <div className="text-2xs mt-0.5" style={{ color: 'var(--danger)' }}>{error}</div>}
       </div>
     )
   }
@@ -212,7 +212,7 @@ export function CalendarInviteChip({ attachment, event }: Props) {
       )}
 
       {error && (
-        <div className="text-2xs mt-0.5" style={{ color: '#c0392b' }}>{error}</div>
+        <div className="text-2xs mt-0.5" style={{ color: 'var(--danger)' }}>{error}</div>
       )}
     </div>
   )

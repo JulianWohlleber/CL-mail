@@ -165,7 +165,7 @@ function ActionButton({ children, onClick, title, active }: {
       className="w-[30px] h-[30px] flex items-center justify-center rounded transition-colors"
       style={{
         fontSize: '15px',
-        color: active ? '#F1C40F' : 'var(--ink-tertiary)',
+        color: active ? 'var(--star)' : 'var(--ink-tertiary)',
         backgroundColor: 'transparent'
       }}
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--paper-raised)')}

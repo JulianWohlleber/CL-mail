@@ -255,7 +255,7 @@ function CalendarTab() {
                     {a.username} · {a.calendarCount} calendar{a.calendarCount === 1 ? '' : 's'}
                   </div>
                   {a.lastError && (
-                    <div className="text-2xs mt-0.5" style={{ color: '#c0392b' }}>{a.lastError}</div>
+                    <div className="text-2xs mt-0.5" style={{ color: 'var(--danger)' }}>{a.lastError}</div>
                   )}
                 </div>
               </div>
@@ -651,7 +651,7 @@ function AccountsTab({ onClose }: { onClose: () => void }) {
                       className="font-mono px-1.5 py-0.5 rounded"
                       style={{
                         fontSize: 10,
-                        color: '#c0392b',
+                        color: 'var(--danger)',
                         backgroundColor: '#fdecea',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em'
@@ -807,7 +807,7 @@ function SetPasswordInline({ accountId, onSuccess }: { accountId: string; onSucc
         </button>
       </div>
       {error && (
-        <div className="text-2xs mt-1" style={{ color: '#c0392b' }}>{error}</div>
+        <div className="text-2xs mt-1" style={{ color: 'var(--danger)' }}>{error}</div>
       )}
     </div>
   )

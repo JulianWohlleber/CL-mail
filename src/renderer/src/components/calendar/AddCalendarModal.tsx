@@ -193,7 +193,7 @@ export function AddCalendarModal({ onClose, onAdded }: Props) {
                   {busy ? 'Testing…' : 'Test connection'}
                 </button>
                 {testResult && (
-                  <span className="text-xs" style={{ color: testResult.ok ? 'var(--accent)' : '#c0392b' }}>
+                  <span className="text-xs" style={{ color: testResult.ok ? 'var(--accent)' : 'var(--danger)' }}>
                     {testResult.ok ? '✓ ' : '✗ '}{testResult.msg}
                   </span>
                 )}

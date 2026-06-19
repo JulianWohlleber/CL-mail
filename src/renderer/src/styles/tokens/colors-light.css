@@ -28,6 +28,11 @@
   --danger: #dc2626;
   --success: #16a34a;
   --warning: #ca8a04;
+  /* Star / flag highlight. */
+  --star: #f1c40f;
+  /* Canvas behind rendered email HTML. Stays light in both themes because
+     most email markup assumes a white background. */
+  --email-canvas: #ffffff;
 
   --shadow-color: 0 0% 50%;
 }

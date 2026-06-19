@@ -26,6 +26,9 @@
   --danger: #f87171;
   --success: #4ade80;
   --warning: #facc15;
+  --star: #f1c40f;
+  /* Email canvas stays light even in dark mode — email HTML assumes white. */
+  --email-canvas: #ffffff;
 
   --shadow-color: 0 0% 5%;
 }

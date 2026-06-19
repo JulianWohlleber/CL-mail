@@ -71,7 +71,13 @@ function applyOperator(op: string, arg: string, ftsParts: string[], result: Pars
       if (arg) ftsParts.push(`from_address:${ftsEscape(arg)}* OR from_name:${ftsEscape(arg)}*`)
       break
     case 'to':
-      if (arg) ftsParts.push(`to_list:${ftsEscape(arg)}*`)
+      // NOTE: the messages_fts table only indexes subject/body_text/from_name/
+      // from_address — there is NO to_list column. A column-filter against a
+      // non-existent FTS column raises "fts5: no such column" and fails the
+      // whole query, so we push the term as a plain FTS term instead. (To make
+      // `to:` recipient-scoped we'd need to add to_list to the FTS schema +
+      // triggers and reindex — tracked, not done here.)
+      if (arg) ftsParts.push(ftsEscape(arg))
       break
     case 'subject':
       if (arg) ftsParts.push(`subject:${ftsEscape(arg)}*`)
