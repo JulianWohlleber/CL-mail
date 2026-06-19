@@ -102,6 +102,9 @@ const api = {
   getSettings: (key?: string) => ipcRenderer.invoke(IPC.SETTINGS_GET, key),
   setSetting: (key: string, value: any) => ipcRenderer.invoke(IPC.SETTINGS_SET, key, value),
   openSystemPane: (pane: string) => ipcRenderer.invoke(IPC.SETTINGS_OPEN_SYSTEM_PANE, pane),
+  getAppInfo: () => ipcRenderer.invoke(IPC.APP_INFO),
+  recordUsage: (action: string) => ipcRenderer.invoke(IPC.USAGE_RECORD, action),
+  getUsageSummary: () => ipcRenderer.invoke(IPC.USAGE_SUMMARY),
 
   // Events (main -> renderer)
   onNewMail: (cb: (data: any) => void) => {

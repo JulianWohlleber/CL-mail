@@ -57,7 +57,8 @@ function runMigrations(db: Database.Database): void {
     { name: '008_fix_thread_folders', sql: MIGRATION_008 },
     { name: '009_calendar', sql: MIGRATION_009 },
     { name: '010_cloud_storage', sql: MIGRATION_010 },
-    { name: '011_drafts', sql: MIGRATION_011 }
+    { name: '011_drafts', sql: MIGRATION_011 },
+    { name: '012_usage', sql: MIGRATION_012 }
   ]
 
   for (const migration of migrations) {
@@ -414,4 +415,16 @@ const MIGRATION_011 = `
   );
   CREATE INDEX IF NOT EXISTS idx_drafts_mode_thread
     ON local_drafts(mode, reply_to_thread_id);
+`
+
+const MIGRATION_012 = `
+  -- Local-only, opt-in usage counters (sprint #7). Strictly on-device — these
+  -- never leave the machine, there is no network sink. They exist so the user
+  -- (and the team, when looking at someone's machine) can reason about which
+  -- features actually get used. Recording is gated on settings.usageStatsEnabled.
+  CREATE TABLE IF NOT EXISTS usage_counters (
+    action TEXT PRIMARY KEY,
+    count INTEGER NOT NULL DEFAULT 0,
+    last_used INTEGER
+  );
 `

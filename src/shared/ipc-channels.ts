@@ -78,6 +78,10 @@ export const IPC = {
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
   SETTINGS_OPEN_SYSTEM_PANE: 'settings:open-system-pane',
+  // Sprint #7 — About surface + local-only opt-in usage counters
+  APP_INFO: 'app:info',
+  USAGE_RECORD: 'usage:record',
+  USAGE_SUMMARY: 'usage:summary',
 
   // Vault
   VAULT_PICK_FOLDER: 'vault:pick-folder',

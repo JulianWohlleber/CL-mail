@@ -2,6 +2,15 @@ import { create } from 'zustand'
 import type { Thread, Message, Folder } from '@shared/types/mail'
 import { ALL_INBOXES_ID, SEARCH_RESULTS_ID } from '@shared/constants'
 
+/**
+ * Fire-and-forget local usage counter (sprint #7). The main process no-ops
+ * unless the user opted in via Settings → Usage stats, so this is always safe
+ * to call and never touches the network.
+ */
+function recordUsage(action: string): void {
+  try { (window.api as any).recordUsage?.(action) } catch { /* ignore */ }
+}
+
 interface MailState {
   threads: Thread[]
   selectedThreadId: string | null
@@ -232,6 +241,7 @@ export const useMailStore = create<MailState>((set, get) => ({
   },
 
   archive: async (threadId) => {
+    recordUsage('archive')
     // If the user has bulk-selected threads, prefer that set (unless an explicit id was passed).
     const { selectedIds } = get()
     const ids = threadId
@@ -292,6 +302,7 @@ export const useMailStore = create<MailState>((set, get) => ({
   },
 
   trash: async (threadId) => {
+    recordUsage('trash')
     const { selectedIds } = get()
     const ids = threadId
       ? [threadId]

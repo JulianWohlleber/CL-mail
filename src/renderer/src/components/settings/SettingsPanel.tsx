@@ -110,6 +110,18 @@ export function SettingsPanel() {
                   ))}
                 </select>
               </SettingRow>
+
+              <SettingRow
+                label="Usage stats (on-device)"
+                description="Count which features you use. Strictly local — never leaves this Mac."
+              >
+                <Toggle
+                  value={!!settings.usageStatsEnabled}
+                  onChange={(v) => updateSetting('usageStatsEnabled', v)}
+                />
+              </SettingRow>
+
+              <AboutSection />
             </div>
           )}
 
@@ -796,6 +808,48 @@ function SetPasswordInline({ accountId, onSuccess }: { accountId: string; onSucc
       </div>
       {error && (
         <div className="text-2xs mt-1" style={{ color: '#c0392b' }}>{error}</div>
+      )}
+    </div>
+  )
+}
+
+function AboutSection() {
+  const [info, setInfo] = useState<any>(null)
+  const [usage, setUsage] = useState<any[]>([])
+
+  useEffect(() => {
+    ;(window.api as any).getAppInfo().then(setInfo)
+    ;(window.api as any).getUsageSummary().then((rows: any[]) => setUsage(rows || []))
+  }, [])
+
+  return (
+    <div className="pt-4 mt-2" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="text-xs font-bold mb-1" style={{ color: 'var(--ink-secondary)' }}>About</div>
+      {info && (
+        <div className="text-xs space-y-0.5" style={{ color: 'var(--ink-tertiary)' }}>
+          <div>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>mail_</span> v{info.version}
+            {' · '}{info.platform}/{info.arch}
+          </div>
+          <div className="font-mono" style={{ fontSize: 'var(--font-size-2xs)' }}>
+            Electron {info.electron} · Chromium {info.chrome} · Node {info.node}
+          </div>
+        </div>
+      )}
+      {usage.length > 0 && (
+        <div className="mt-2">
+          <div className="text-2xs font-mono uppercase mb-1" style={{ color: 'var(--ink-tertiary)' }}>
+            Most-used actions (on-device)
+          </div>
+          <div className="space-y-0.5">
+            {usage.slice(0, 6).map((u) => (
+              <div key={u.action} className="flex items-center justify-between text-xs" style={{ color: 'var(--ink-secondary)' }}>
+                <span className="font-mono">{u.action}</span>
+                <span style={{ color: 'var(--ink-tertiary)' }}>{u.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

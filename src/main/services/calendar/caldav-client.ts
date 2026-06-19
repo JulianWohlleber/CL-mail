@@ -21,12 +21,6 @@ export interface DiscoveredCalendar {
   ctag?: string
 }
 
-export interface RawEvent {
-  href: string
-  etag: string
-  ics: string
-}
-
 export class CalDavClient {
   private auth: BasicAuth
   private baseUrl: string
@@ -165,41 +159,6 @@ export class CalDavClient {
     return res.headers.get('Location') || url
   }
 
-  /** Fetch raw events in a time window (UTC ISO strings). */
-  async fetchEvents(calendarUrl: string, startUtc: string, endUtc: string): Promise<RawEvent[]> {
-    const body = `<?xml version="1.0"?>
-      <c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
-        <d:prop>
-          <d:getetag/>
-          <c:calendar-data/>
-        </d:prop>
-        <c:filter>
-          <c:comp-filter name="VCALENDAR">
-            <c:comp-filter name="VEVENT">
-              <c:time-range start="${toIcsDateUtc(startUtc)}" end="${toIcsDateUtc(endUtc)}"/>
-            </c:comp-filter>
-          </c:comp-filter>
-        </c:filter>
-      </c:calendar-query>`
-    const xml = await this.dav(calendarUrl, 'REPORT', body, { Depth: '1' })
-
-    const events: RawEvent[] = []
-    const responses = xml.split(/<(?:[a-z]+:)?response[^>]*>/i).slice(1)
-    for (const r of responses) {
-      const hrefMatch = r.match(/<(?:[a-z]+:)?href[^>]*>([^<]+)/i)
-      const etagMatch = r.match(/<(?:[a-z]+:)?getetag[^>]*>([^<]+)/i)
-      const dataMatch = r.match(/<(?:[a-z]+:)?calendar-data[^>]*>([\s\S]*?)<\/(?:[a-z]+:)?calendar-data>/i)
-      if (!hrefMatch || !dataMatch) continue
-      let href = hrefMatch[1].trim()
-      if (!href.startsWith('http')) href = new URL(href, calendarUrl).toString()
-      events.push({
-        href,
-        etag: etagMatch ? etagMatch[1].trim().replace(/"/g, '') : '',
-        ics: decodeXmlEntities(dataMatch[1].trim())
-      })
-    }
-    return events
-  }
 }
 
 /**
@@ -240,11 +199,4 @@ function decodeXmlEntities(s: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
-}
-
-function toIcsDateUtc(iso: string): string {
-  // Accept either an ISO string or epoch ms.
-  const d = typeof iso === 'number' ? new Date(iso) : new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`
 }

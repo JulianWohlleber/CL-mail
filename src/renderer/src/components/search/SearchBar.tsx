@@ -66,6 +66,9 @@ export function SearchBar() {
           placeholder="Search mail…"
           className="flex-1 bg-transparent outline-none text-sm"
           style={{ color: 'var(--ink)' }}
+          /* Opt out of the empty-input shortcut passthrough: while the search
+             box is focused, every key (except Escape) types into it. */
+          data-disable-shortcuts="true"
         />
         {query && (
           <button

@@ -1,4 +1,4 @@
-import { ipcMain, shell } from 'electron'
+import { ipcMain, shell, app } from 'electron'
 import Database from 'better-sqlite3'
 import { IPC } from '@shared/ipc-channels'
 import { DEFAULT_SETTINGS } from '@shared/types/settings'
@@ -58,5 +58,46 @@ export function registerSettingsHandlers(db: Database.Database): void {
     } catch (err) {
       return { success: false, error: (err as Error).message }
     }
+  })
+
+  // ── About surface (sprint #7) ───────────────────────────────────────────
+  ipcMain.handle(IPC.APP_INFO, () => ({
+    version: app.getVersion(),
+    name: 'mail_',
+    electron: process.versions.electron,
+    chrome: process.versions.chrome,
+    node: process.versions.node,
+    platform: process.platform,
+    arch: process.arch
+  }))
+
+  // ── Local-only opt-in usage counters (sprint #7) ────────────────────────
+  // Gated on settings.usageStatsEnabled. Strictly on-device; no network sink.
+  const usageEnabled = (): boolean => {
+    try {
+      const row = db.prepare("SELECT value FROM settings WHERE key = 'usageStatsEnabled'").get() as { value: string } | undefined
+      if (!row) return false
+      try { return JSON.parse(row.value) === true } catch { return row.value === 'true' }
+    } catch { return false }
+  }
+
+  ipcMain.handle(IPC.USAGE_RECORD, (_event, action: string) => {
+    if (!action || !usageEnabled()) return { recorded: false }
+    db.prepare(`
+      INSERT INTO usage_counters (action, count, last_used)
+      VALUES (?, 1, unixepoch())
+      ON CONFLICT(action) DO UPDATE SET
+        count = count + 1,
+        last_used = unixepoch()
+    `).run(action)
+    return { recorded: true }
+  })
+
+  ipcMain.handle(IPC.USAGE_SUMMARY, () => {
+    return db.prepare(`
+      SELECT action, count, last_used AS lastUsed
+      FROM usage_counters
+      ORDER BY count DESC
+    `).all()
   })
 }

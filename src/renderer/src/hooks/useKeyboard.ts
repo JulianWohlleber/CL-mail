@@ -99,9 +99,6 @@ export function useKeyboard(
       // The modal handles its own Arrow/Enter/Escape via React onKeyDown.
       const ui = useUIStore.getState()
       if (ui.moveToFolderOpen) {
-        if (e.key.length === 1 || e.key === 'Backspace') {
-          console.log(`[Keyboard] blocked: move-folder modal open`)
-        }
         return
       }
       // Command palette: similar — block global shortcuts while it's open,
@@ -110,7 +107,6 @@ export function useKeyboard(
       if (cmd.isOpen) {
         const normalized = normalizeKey(e)
         if (normalized !== 'Cmd+k' && normalized !== 'Escape') {
-          if (e.key.length === 1) console.log(`[Keyboard] blocked: command palette open`)
           return
         }
       }
@@ -125,6 +121,11 @@ export function useKeyboard(
       //     work without first having to click somewhere else.
       const target = e.target as HTMLElement
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+      // Inputs that opt out of the "empty input fires a shortcut" passthrough
+      // entirely. The search box does this: when it's focused the user is there
+      // to TYPE, and a query like "ebay" must not archive the thread on the
+      // first 'e'. Escape still passes through so it can blur/close search.
+      const optsOutOfShortcuts = target.getAttribute?.('data-disable-shortcuts') === 'true'
       if (isInput) {
         if (e.metaKey || e.ctrlKey) {
           const editKeys = ['a', 'c', 'v', 'x', 'z', 'y']
@@ -134,6 +135,10 @@ export function useKeyboard(
           // Other Cmd-shortcuts fall through to global handler
         } else if (e.key === 'Escape') {
           // Falls through so Escape can close modals or blur
+        } else if (optsOutOfShortcuts) {
+          // Search field (or any opt-out input): every non-Escape key belongs
+          // to the input. Never blur, never fire a shortcut.
+          return
         } else {
           const inputEl = target as HTMLInputElement | HTMLTextAreaElement
           const isEmpty = !('value' in inputEl) || !inputEl.value
@@ -153,9 +158,6 @@ export function useKeyboard(
             inputEl.blur()
             // Fall through to the shortcut dispatcher below.
           } else {
-            if (e.key.length === 1) {
-              console.log(`[Keyboard] key "${e.key}" went to input <${target.tagName.toLowerCase()}> (value="${(inputEl as any).value ?? ''}") — clear input to use shortcuts`)
-            }
             return
           }
         }
@@ -202,9 +204,9 @@ export function useKeyboard(
         } else {
           console.warn(`[Keyboard] Action "${action}" has no handler`)
         }
-      } else {
-        console.log(`[Keyboard] No binding for key "${normalized}"`)
       }
+      // Unbound keys are silently ignored — logging every keystroke spammed
+      // the console for users (sprint #7 cleanup).
     }
 
     document.addEventListener('keydown', handleKeyDown)

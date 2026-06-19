@@ -23,6 +23,8 @@ export interface AppSettings {
   macContactsEnabled: boolean
   /** If false, the calendar-invite chip won't open .ics in Calendar.app. */
   calendarImportEnabled: boolean
+  /** Sprint #7 — opt-in, strictly on-device usage counters. Default off. */
+  usageStatsEnabled: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -47,5 +49,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   // Off by default — never trigger a Contacts permission prompt unless the
   // user explicitly opts in from the Privacy settings.
   macContactsEnabled: false,
-  calendarImportEnabled: true
+  calendarImportEnabled: true,
+  usageStatsEnabled: false
 }
