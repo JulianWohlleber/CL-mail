@@ -4,7 +4,7 @@
 //      missing FTS column raises "fts5: no such column: to_list" and fails the
 //      ENTIRE query — so any search containing `to:` returned nothing.
 // FIXED: 2026-06 (sprint #7 review, v0.1.8) — HIGH finding (David)
-// SYMPTOM: Searching `to:hannes` (alone or with other terms) returns no results.
+// SYMPTOM: Searching `to:alice` (alone or with other terms) returns no results.
 // CONTRACT: applyOperator's `to` case must NOT emit a to_list: column filter.
 //   Either the FTS schema gains a to_list column (and this test should be
 //   updated to assert that) or the operator pushes a plain term.

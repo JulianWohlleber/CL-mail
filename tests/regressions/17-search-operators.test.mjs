@@ -4,7 +4,7 @@
 //      probably doesn't exist — returns garbage. Sprint #6 added a parser
 //      that translates user operators into the right structured filters.
 // FIXED: 2026-05 (sprint #6, v0.1.6)
-// SYMPTOM: User types `from:hannes`, gets either nothing or unrelated results.
+// SYMPTOM: User types `from:alice`, gets either nothing or unrelated results.
 // CONTRACT: parseSearchQuery exists and:
 //   - `from:foo`              → fts mentions from_address/from_name
 //   - `subject:foo`           → fts targets the subject column

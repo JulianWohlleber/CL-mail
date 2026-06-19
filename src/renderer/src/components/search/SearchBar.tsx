@@ -92,10 +92,10 @@ export function SearchBar() {
             Filters
           </div>
           <div className="text-xs space-y-0.5" style={{ color: 'var(--ink-secondary)' }}>
-            <div><code>from:hannes</code> — restrict by sender</div>
+            <div><code>from:alice</code> — restrict by sender</div>
             <div><code>subject:invoice</code> — restrict by subject</div>
             <div><code>has:attachment</code> · <code>has:unread</code> · <code>has:starred</code></div>
-            <div className="opacity-60 mt-1">Combine operators with free text, e.g. <code>from:hannes Q3</code>.</div>
+            <div className="opacity-60 mt-1">Combine operators with free text, e.g. <code>from:alice Q3</code>.</div>
           </div>
         </div>
       )}
