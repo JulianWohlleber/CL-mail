@@ -3,6 +3,16 @@
 A keyboard-first desktop mail client inspired by Superhuman and iA Writer.
 Built with Electron, React 19, TypeScript and a healthy distrust of bloat.
 
+## Install
+
+macOS on Apple Silicon. Download **`mail-space-<version>.dmg`** from the
+[latest release](https://github.com/JulianWohlleber/CL-mail/releases/latest),
+open it, and drag **mail_** into Applications. On first launch, right-click the
+app → **Open** (it's unsigned, so a plain double-click is blocked once).
+
+Prefer a script that handles the Gatekeeper step for you, or building from
+source? See **[INSTALL.md](INSTALL.md)**.
+
 ## What it does
 
 - Multi-account IMAP / SMTP with full-text search (SQLite FTS5)
