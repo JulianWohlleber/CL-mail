@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JulianWohlleber/CL-mail/main/docs/assets/icon.png?v=3" alt="mail_ icon" width="96" height="96">
+  <img src="https://raw.githubusercontent.com/JulianWohlleber/CL-mail/main/docs/assets/icon.png?v=4" alt="mail_ icon" width="96" height="96">
 </p>
 
 <h1 align="center">mail_</h1>
