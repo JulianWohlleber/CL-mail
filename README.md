@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/icon.png" alt="mail_ icon" width="96" height="96">
+</p>
+
 <h1 align="center">mail_</h1>
 
 <p align="center">
