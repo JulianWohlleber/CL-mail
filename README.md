@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/icon.png" alt="mail_ icon" width="96" height="96">
+  <img src="https://raw.githubusercontent.com/JulianWohlleber/CL-mail/main/docs/assets/icon.png?v=2" alt="mail_ icon" width="96" height="96">
 </p>
 
 <h1 align="center">mail_</h1>
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/hero.png" alt="mail_ — unified inbox with an open thread" width="880">
+  <img src="https://raw.githubusercontent.com/JulianWohlleber/CL-mail/main/docs/assets/hero.png?v=2" alt="mail_ — unified inbox with an open thread" width="880">
 </p>
 
 ---
