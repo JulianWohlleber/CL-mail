@@ -14,6 +14,10 @@ mac:
   extendInfo:
     NSMicrophoneUsageDescription: Not required
     NSCameraUsageDescription: Not required
+    # Contacts autocomplete for recipients. MAS build uses the native Contacts
+    # framework; the Developer-ID build automates Contacts.app via osascript.
+    NSContactsUsageDescription: mail_ suggests recipients from your contacts as you type. This stays on your Mac.
+    NSAppleEventsUsageDescription: mail_ reads your contacts to suggest recipients as you type.
   notarize: false
   target:
     - dmg

@@ -730,14 +730,18 @@ function AccountsTab({ onClose }: { onClose: () => void }) {
         >
           + Add Account
         </button>
-        <button
-          onClick={() => setShowAppleMailImport(true)}
-          className="px-3 py-2 text-xs rounded"
-          style={{ border: '1px solid var(--border)', color: 'var(--ink-secondary)' }}
-          title="Read accounts from Apple Mail's config and add them here"
-        >
-          Import from Apple Mail…
-        </button>
+        {/* Apple Mail import reads ~/Library/Mail — impossible in the sandbox,
+            so it's hidden in the Mac App Store build. */}
+        {!__MAS_BUILD__ && (
+          <button
+            onClick={() => setShowAppleMailImport(true)}
+            className="px-3 py-2 text-xs rounded"
+            style={{ border: '1px solid var(--border)', color: 'var(--ink-secondary)' }}
+            title="Read accounts from Apple Mail's config and add them here"
+          >
+            Import from Apple Mail…
+          </button>
+        )}
         {accounts.some((a: any) => a.vaultPath) && (
           <button
             onClick={handleSyncVault}

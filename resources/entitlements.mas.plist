@@ -22,6 +22,12 @@
   <key>com.apple.security.files.downloads.read-write</key>
   <true/>
 
+  <!-- Native Contacts autocomplete (CNContactStore via node-mac-contacts).
+       Requires an NSContactsUsageDescription string in Info.plist too. Remove
+       this and drop the addon if you ship without Contacts autocomplete. -->
+  <key>com.apple.security.personal-information.addressbook</key>
+  <true/>
+
   <!-- Keychain sharing group. REPLACE "TEAMID" with your 10-char Apple Team ID
        (App Store Connect → Membership). Must match the app group registered in
        the Developer portal and the App ID's capabilities. -->

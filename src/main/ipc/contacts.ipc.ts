@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
-import { exec } from 'child_process'
 import Database from 'better-sqlite3'
 import { IPC } from '@shared/ipc-channels'
+import { searchMacContacts as searchMacContactsBackend } from '../services/contacts/mac-contacts'
 
 interface ContactResult {
   name: string
@@ -10,49 +10,11 @@ interface ContactResult {
   frequency: number
 }
 
-// Search macOS Contacts by query (much faster than loading all 1000+ contacts)
-function searchMacContacts(query: string): Promise<ContactResult[]> {
-  return new Promise((resolve) => {
-    const escapedQuery = query.replace(/'/g, "'\"'\"'").replace(/\\/g, '\\\\')
-    const script = `tell application "Contacts"
-  set output to ""
-  set matchingPeople to (every person whose name contains "${escapedQuery}")
-  repeat with p in matchingPeople
-    set pName to name of p
-    repeat with e in emails of p
-      set output to output & pName & tab & value of e & linefeed
-    end repeat
-  end repeat
-  set matchingEmails to (every person whose value of emails contains "${escapedQuery}")
-  repeat with p in matchingEmails
-    set pName to name of p
-    repeat with e in emails of p
-      set output to output & pName & tab & value of e & linefeed
-    end repeat
-  end repeat
-  return output
-end tell`
-
-    exec(`osascript -e '${script}'`, { timeout: 8000 }, (err, stdout) => {
-      if (err) {
-        resolve([])
-        return
-      }
-      const seen = new Set<string>()
-      const results: ContactResult[] = []
-      for (const line of stdout.split('\n').filter(Boolean)) {
-        const parts = line.split('\t')
-        const name = parts[0] || ''
-        const address = (parts[1] || '').trim()
-        if (!address || !address.includes('@')) continue
-        const key = address.toLowerCase()
-        if (seen.has(key)) continue
-        seen.add(key)
-        results.push({ name, address, source: 'contacts', frequency: 0 })
-      }
-      resolve(results)
-    })
-  })
+// macOS Contacts lookup — backend chosen by build (native CNContactStore in the
+// App Store build, osascript in the Developer-ID build). See mac-contacts.ts.
+async function searchMacContacts(query: string): Promise<ContactResult[]> {
+  const hits = await searchMacContactsBackend(query)
+  return hits.map((h) => ({ name: h.name, address: h.address, source: 'contacts' as const, frequency: 0 }))
 }
 
 export function registerContactHandlers(db: Database.Database): void {

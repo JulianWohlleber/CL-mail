@@ -10,6 +10,8 @@
     "start": "electron-vite preview",
     "postinstall": "electron-builder install-app-deps",
     "build:mac": "npm test && npm run build && electron-builder --mac",
+    "build:mas": "npm test && MAS_BUILD=1 npm run build && MAS_BUILD=1 electron-builder --mac mas",
+    "build:mas-dev": "MAS_BUILD=1 npm run build && MAS_BUILD=1 electron-builder --mac masDev",
     "lint": "tsc --noEmit",
     "test": "node tests/regressions/_runner.mjs"
   },
@@ -20,6 +22,7 @@
     "electron-updater": "^6.3.9",
     "imapflow": "^1.0.170",
     "mailparser": "^3.7.2",
+    "node-mac-contacts": "^1.7.2",
     "nodemailer": "^6.9.16",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

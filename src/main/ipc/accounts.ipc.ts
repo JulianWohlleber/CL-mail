@@ -161,6 +161,15 @@ export function registerAccountHandlers(db: Database.Database): void {
   // Both are gated behind macOS Full Disk Access. If both fail, we return a
   // specific error code so the UI can show a "grant access" guide.
   ipcMain.handle(IPC.ACCOUNTS_DISCOVER_APPLE_MAIL, () => {
+    // Reading ~/Library/Mail and spawning `plutil` are both forbidden inside
+    // the App Sandbox, so this feature can't exist in the Mac App Store build.
+    if (__MAS_BUILD__) {
+      return {
+        success: false,
+        error: 'unavailable-in-app-store',
+        message: 'Importing accounts from Apple Mail isn’t available in the App Store version (macOS sandboxing forbids reading another app’s data). Add the account manually instead.'
+      }
+    }
     const home = app.getPath('home')
 
     // Skip accounts already in mail_.

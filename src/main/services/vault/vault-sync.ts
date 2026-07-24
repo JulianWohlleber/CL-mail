@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import { mkdirSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
+import { withVaultAccess } from './vault-access'
 
 interface MessageRow {
   id: string
@@ -78,8 +79,8 @@ export class VaultSync {
   private syncAccount(account: AccountRow): void {
     if (!account.vault_path) return
 
-    const mailDir = join(account.vault_path, 'Mail')
-    mkdirSync(mailDir, { recursive: true })
+    // Note: the mail dir is created inside writeThreadFile (wrapped in
+    // security-scoped access for the MAS build), so no pre-loop mkdir here.
 
     const threads = this.db
       .prepare('SELECT * FROM threads WHERE account_id = ? ORDER BY last_message_date DESC')
@@ -107,9 +108,6 @@ export class VaultSync {
     folder: { name: string; role: string } | undefined,
     accountEmail: string
   ): void {
-    const mailDir = join(vaultPath, 'Mail')
-    mkdirSync(mailDir, { recursive: true })
-
     // Create a safe filename from subject
     const safeSubject = (thread.subject || 'No Subject')
       .replace(/[/\\:*?"<>|#%&{}$!'@+`=]/g, '-')
@@ -120,12 +118,18 @@ export class VaultSync {
     // Use date prefix for sorting
     const date = new Date(thread.last_message_date)
     const datePrefix = date.toISOString().slice(0, 10)
-    const filename = `${datePrefix} ${safeSubject}.md`
-    const filepath = join(mailDir, filename)
 
     // Build markdown content
     const md = this.buildMarkdown(thread, messages, folder, accountEmail)
-    writeFileSync(filepath, md, 'utf-8')
+
+    // In the MAS build, wrap the write in security-scoped access to the
+    // user-picked vault folder; in the Developer-ID build this runs directly.
+    withVaultAccess(this.db, vaultPath, () => {
+      const mailDir = join(vaultPath, 'Mail')
+      mkdirSync(mailDir, { recursive: true })
+      const filepath = join(mailDir, `${datePrefix} ${safeSubject}.md`)
+      writeFileSync(filepath, md, 'utf-8')
+    })
   }
 
   private buildMarkdown(

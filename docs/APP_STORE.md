@@ -193,11 +193,30 @@ Electron + MAS if** you just want *this* Mac app in the store with the least wor
 
 ## Where things stand
 
-- ✅ Entitlements + `mas`/`masDev` build targets committed.
-- ✅ Sandbox audit done against the real code.
-- ⬜ You: Developer Program, certs, App ID, provisioning profile, ASC record,
-  privacy policy URL.
-- ⬜ Code: gate out import/Contacts/vault for the MAS build (ask me to wire the flag).
-- ⬜ Metadata + screenshots (draft in `docs/appstore-metadata.md`).
+**Code side — done ✅**
 
-Tell me which path you want (notarized-direct vs MAS) and I'll do the code side.
+- Entitlements (`resources/entitlements.mas*.plist`) incl. the Contacts
+  entitlement, and `mas`/`masDev` build targets.
+- `__MAS_BUILD__` build flag (electron-vite) with `npm run build:mas` /
+  `build:mas-dev` scripts.
+- **Apple Mail / Mailspring import** — gated out of the MAS build (returns a
+  clear "unavailable in the App Store" message; the button is hidden).
+- **Contacts autocomplete** — now uses the **native Contacts framework**
+  (`node-mac-contacts` → `CNContactStore`) in the MAS build; osascript remains
+  only in the Developer-ID build. `NSContactsUsageDescription` added.
+- **Vault export** — writes go through **security-scoped bookmarks** in the MAS
+  build (`withVaultAccess`); the folder picker stores the bookmark.
+- Regression test #21 pins all of the above so it can't silently un-gate.
+
+**You still need (can't be done from code):**
+
+- ⬜ Developer Program, certs (Apple Distribution + Mac Installer Distribution),
+  App ID `com.mail.app` with App Sandbox + App Groups + Contacts, a MAS
+  provisioning profile → `resources/embedded.provisionprofile`.
+- ⬜ Replace `TEAMID` in `resources/entitlements.mas.plist` with your Team ID.
+- ⬜ App Store Connect record + privacy policy URL.
+- ⬜ Metadata + screenshots (draft in `docs/appstore-metadata.md`).
+- ⬜ `electron-rebuild` will compile `node-mac-contacts` for Electron's ABI in
+  your build env (postinstall already runs `install-app-deps`).
+
+Then: `npm run build:mas` → upload the `.pkg` via Transporter → submit.
