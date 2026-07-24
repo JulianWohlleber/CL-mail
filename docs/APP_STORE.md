@@ -90,7 +90,7 @@ work, ❌ = forbidden, must be removed/gated out of the MAS build.
 | Open attachment / open .ics | `shell.openPath` on userData/tmp file | ⚠️ | opening user-created files is allowed, but auto-launching Calendar.app with a generated temp `.ics` is fragile — prefer "Save .ics…" via a save panel, or the CalDAV accept flow |
 | **Vault export** to a folder | `services/vault/vault-sync.ts` writes to `account.vault_path` | ❌ writing an arbitrary stored path is blocked | rework to **security-scoped bookmarks**: user picks the folder in an open panel, persist the bookmark, resolve + `startAccessingSecurityScopedResource` before each write. Otherwise gate the whole vault feature out of the MAS build |
 | **Apple Mail / Mailspring import** | `accounts.ipc.ts` reads `~/Library/Mail`, `~/Library/Accounts/Accounts4.sqlite`, runs `plutil`/`execSync` | ❌ reading other apps' data + spawning child processes are both forbidden | **remove** from the MAS build |
-| **macOS Contacts autocomplete** | `contacts.ipc.ts` runs `osascript` to script Contacts.app | ❌ AppleScript automation + child process = blocked/rejected | **remove** from the MAS build (recipient suggestions still work from mail history) |
+| **macOS Contacts autocomplete** | `contacts.ipc.ts` runs `osascript` to script Contacts.app | ⚠️ the *osascript* approach is blocked, but Contacts itself is allowed | **replace osascript with the native Contacts framework** (`CNContactStore`) via a Node native addon (e.g. `node-mac-contacts`) + the `com.apple.security.personal-information.addressbook` entitlement + an `NSContactsUsageDescription` string. Then it keeps working in the MAS build with the standard system permission prompt. (Or just remove it — history-based suggestions still work.) |
 
 **Net:** the core mail client is sandbox-clean. Three features must go or be
 reworked: Apple Mail/Mailspring import (remove), Contacts autocomplete (remove),
@@ -154,6 +154,40 @@ submit for review.
   servers the *user* configures. Nothing goes to you. Say that.
 - **Encryption compliance:** uses HTTPS/TLS → answer "Yes" to encryption, then
   it qualifies for the standard exemption (no export docs needed).
+
+---
+
+## Path C — native rewrite (Swift / SwiftUI)
+
+The same *look* is fully reproducible natively (iA Writer fonts, the paper
+tokens, the three-pane layout, mono metadata). But this is a **from-scratch
+rebuild**, not a port — React → SwiftUI and Node → Swift share no code.
+
+**What carries over:** the design, the product/UX decisions, the QA plan, the
+architecture lessons. **What gets rewritten:** essentially all code.
+
+**Native building blocks (all first-party or mature):**
+
+| Concern | Electron today | Native replacement |
+|---|---|---|
+| UI | React + Tailwind | SwiftUI (+ AppKit where needed) |
+| IMAP/SMTP | ImapFlow / Nodemailer | **MailCore2** (mature ObjC/C lib) |
+| DB + search | better-sqlite3 + FTS5 | **GRDB.swift** (SQLite + FTS5) |
+| Calendar | hand-rolled CalDAV | **EventKit** (native, easier + better) |
+| Contacts | osascript (blocked) | **CNContactStore** (native, allowed) |
+| Keychain | Electron safeStorage | **Keychain Services** |
+| Cloud/WebDAV | fetch | URLSession |
+
+**Trade-offs:**
+
+- ✅ Cleanest App Store citizen; native permissions for Contacts/Calendar just work.
+- ✅ ~a few MB instead of Electron's ~150 MB; better memory/battery/perf.
+- ✅ **The only path that can ever reach the iPhone/iPad App Store** — a shared
+  SwiftUI codebase can target iOS/iPadOS. Electron never can.
+- ❌ Weeks–months of work; you re-implement everything (though not re-*design* it).
+
+**Pick native if** you want true native quality and/or a real iOS future. **Pick
+Electron + MAS if** you just want *this* Mac app in the store with the least work.
 
 ---
 
