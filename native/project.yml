@@ -1,0 +1,32 @@
+# XcodeGen spec for the native mail_ (SwiftUI, macOS).
+# Generate the Xcode project with:  cd native && xcodegen generate
+# Then open mail_.xcodeproj, or build headless:
+#   xcodebuild -project mail_.xcodeproj -scheme mail_ -configuration Debug build
+name: mail_
+options:
+  bundleIdPrefix: com.mail
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  mail_:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mail.app
+        PRODUCT_NAME: "mail_"
+        GENERATE_INFOPLIST_FILE: YES
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
+        INFOPLIST_KEY_NSContactsUsageDescription: "mail_ suggests recipients from your contacts as you type. This stays on your Mac."
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
