@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- The App Sandbox is MANDATORY for the Mac App Store. -->
+  <key>com.apple.security.app-sandbox</key>
+  <true/>
+
+  <!-- Outbound connections: IMAP, SMTP, CalDAV, Nextcloud/WebDAV. -->
+  <key>com.apple.security.network.client</key>
+  <true/>
+
+  <!-- Files the user explicitly picks in an open/save panel: attachment saves,
+       the vault folder, cloud-upload source files. Sandbox grants access only
+       to user-selected paths (via the powerbox); persist access across launches
+       with a security-scoped bookmark (see docs/APP_STORE.md, Vault section). -->
+  <key>com.apple.security.files.user-selected.read-write</key>
+  <true/>
+
+  <!-- Optional: lets "Save attachment" default into ~/Downloads without a
+       per-file prompt. Remove if you don't want it. -->
+  <key>com.apple.security.files.downloads.read-write</key>
+  <true/>
+
+  <!-- Keychain sharing group. REPLACE "TEAMID" with your 10-char Apple Team ID
+       (App Store Connect → Membership). Must match the app group registered in
+       the Developer portal and the App ID's capabilities. -->
+  <key>com.apple.security.application-groups</key>
+  <array>
+    <string>TEAMID.com.mail.app</string>
+  </array>
+</dict>
+</plist>

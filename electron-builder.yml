@@ -9,6 +9,7 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{tsconfig.json,tsconfig.*.json}'
 mac:
+  category: public.app-category.productivity
   entitlementsInherit: resources/entitlements.mac.plist
   extendInfo:
     NSMicrophoneUsageDescription: Not required
@@ -20,3 +21,30 @@ mac:
   artifactName: ${name}-${version}-${arch}.${ext}
 dmg:
   artifactName: ${name}-${version}.${ext}
+
+# ── Mac App Store target ────────────────────────────────────────────────────
+# Build with:  npx electron-builder --mac mas
+# Prerequisites (see docs/APP_STORE.md):
+#   • Apple Developer Program membership
+#   • Certificates: "Apple Distribution" + "Mac Installer Distribution" (or
+#     "3rd Party Mac Developer Application/Installer" on older accounts)
+#   • App ID com.mail.app registered with App Sandbox + App Groups capabilities
+#   • A Mac App Store provisioning profile at resources/embedded.provisionprofile
+#   • Replace TEAMID in resources/entitlements.mas.plist with your Team ID
+# NOTE: several features are sandbox-incompatible and must be gated out of the
+# MAS build first (Apple Mail / Mailspring import, macOS Contacts autocomplete,
+# direct vault-path writes). See docs/APP_STORE.md → "Sandbox audit".
+mas:
+  category: public.app-category.productivity
+  entitlements: resources/entitlements.mas.plist
+  entitlementsInherit: resources/entitlements.mas.inherit.plist
+  hardenedRuntime: false          # MAS uses the App Sandbox, not the hardened runtime
+  provisioningProfile: resources/embedded.provisionprofile
+# For local testing before submission, a development MAS build (installs on your
+# own Mac without going through review) uses a "Mac Installer Development" +
+# "Apple Development" cert and a development provisioning profile:
+masDev:
+  type: development
+  entitlements: resources/entitlements.mas.plist
+  entitlementsInherit: resources/entitlements.mas.inherit.plist
+  provisioningProfile: resources/development.provisionprofile
